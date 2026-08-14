@@ -6,44 +6,44 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Clean up disk space
+    - name: Clean Up space
       run: |
-        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/powershell /usr/local/share/chromium-driver
-        sudo apt-get clean
-        df -h
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/share/dotnet
 
-    - name: Install Build Dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 libncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip bc python3
+        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf lib32ncurses5-dev lib32z1-dev libmpathpersist-dev libncurses5 libncurses5-dev libreadline-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
 
-    - name: Install Repo tool
+    - name: Install Repo
       run: |
         mkdir -p ~/bin
         curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
         chmod a+x ~/bin/repo
-        echo "$HOME/bin" >> $GITHUB_PATH
+        sudo ln -sf ~/bin/repo /usr/bin/repo
 
-    - name: Initialize TWRP Manifest
+    - name: Initialize Repo
       run: |
         mkdir twrp
         cd twrp
         git config --global user.name "lugotiago01-hub"
         git config --global user.email "lugotiago01@gmail.com"
-        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
+        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+
+    - name: Repo Sync
+      run: |
+        cd twrp
         repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
     - name: Clone Device Tree
       run: |
         cd twrp
-        git clone https://github.com/lugotiago01-hub/android_device_lenovo_TB300FU.git device/lenovo/TB300FU
+        git clone https://github.com/lugotiago01-hub/android_device_lenovo_TB300FU device/lenovo/TB300FU
 
     - name: Build TWRP
       run: |
@@ -57,4 +57,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: TWRP_Lenovo_TB300FU
-       path: twrp/out/target/product/TB300FU/*.img
+        path: twrp/out/target/product/TB300FU/*.img

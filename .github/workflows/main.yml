@@ -37,7 +37,7 @@ jobs:
         cd twrp
         git config --global user.name "lugotiago01-hub"
         git config --global user.email "lugotiago01@gmail.com"
-        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git -b twrp-11.0 --depth=1
+        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git -b twrp-11 --depth=1
         repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
     - name: Clone Device Tree
